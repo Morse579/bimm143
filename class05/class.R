@@ -1,5 +1,5 @@
 # Class05 R graphic intro
-#github
+#github_doc
 # My first boxplot
 x<-rnorm(1000,0)
 boxplot(x)
