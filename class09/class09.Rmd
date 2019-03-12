@@ -1,0 +1,164 @@
+---
+title: "class09"
+author: "Yushan LIU"
+date: "February 7, 2019"
+output: html_document
+---
+
+Preparing the data
+```{r}
+# Save your input data file to a new 'data' directory
+fna.data <- "WisconsinCancer.csv"
+
+# Complete the following code to input the data and store as wisc.df
+wisc.df <- read.csv(fna.data)
+wisc.df
+```
+How many samples (i.e. patients) are in this data-set
+
+
+
+```{r}
+# Convert the features of the data: wisc.data
+wisc.data <- as.matrix(wisc.df[,3:32])
+```
+
+```{r}
+# Set the row names of wisc.data
+row.names(wisc.data) <- wisc.df$id
+head(wisc.data)
+```
+
+Finally, setup a separate new vector called diagnosis to be 1 if a diagnosis is malignant ("M") and 0 otherwise. Note that R coerces TRUE to 1 and FALSE to 0.
+```{r}
+# Create diagnosis vector by completing the missing code
+#tmp<-rep(0,nrow(wisc.df))
+diagnosis <- as.numeric(wisc.df$diagnosis=='M')
+diagnosis
+```
+
+Q1. How many observations are in this dataset?
+Q2. How many variables/features in the data are suffixed with _mean?
+Q3. How many of the observations have a malignant diagnosis?
+
+```{r}
+#1
+nrow(wisc.data)
+#2
+inds<-grep("_mean",colnames(wisc.data))
+colnames(wisc.data)[inds]
+length(inds)
+#3
+sum(diagnosis)
+```
+
+```{r}
+# Check column means and standard deviations
+colMeans(wisc.data)
+
+apply(wisc.data,2,sd)
+```
+
+##Lets do PCA
+
+```{r}
+# Perform PCA on wisc.data by completing the following code
+wisc.pr <- prcomp(wisc.data,scale=TRUE)
+```
+```{r}
+# Look at summary of results
+summary(wisc.pr)
+```
+
+Q4. From your results, what proportion of the original variance is captured by the first principal components (PC1)?
+0.4427
+Q5. How many principal components (PCs) are required to describe at least 70% of the original variance in the data?
+3
+Q6. How many principal components (PCs) are required to describe at least 90% of the original variance in the data?
+7
+
+##Interpreting PCA results
+
+```{r}
+biplot(wisc.pr)
+```
+```{r}
+# Scatter plot observations by components 1 and 2
+plot( wisc.pr$x[,1], wisc.pr$x[,2],col=diagnosis+1,
+     xlab = "PC1", ylab = "PC2")
+```
+### Variance captured in each PC
+
+This info is in the $sdev component of our PCA result
+```{r}
+varance <- wisc.pr$sdev^2
+pve<-round((varance/sum(varance))*100,1)
+```
+```{r}
+plot(pve,type="o")
+```
+
+```{r}
+# Alternative scree plot of the same data, note data driven y-axis
+barplot(pve, ylab = "Precent of Variance Explained",
+     names.arg=paste0("PC",1:length(pve)), las=2, axes = FALSE)
+axis(2, at=pve, labels=round(pve,2)*100 )
+
+```
+
+
+##Hierarchical clustering of case data
+
+For hiearchial clustering 
+```{r}
+# Scale the wisc.data data: data.scaled
+data.scaled <- scale(wisc.data)
+```
+
+```{r}
+data.dist <- dist(data.scaled)
+wisc.hclust <-  hclust(data.dist，method="complete")
+```
+
+```{r}
+plot(wisc.hclust)
+```
+
+### Cluster in PCA space
+For clustering we need?
+1. Distance matrix
+2. Clustering function
+3. cutree
+```{r}
+plot(wisc.pr$x[,1],wisc.pr$x[,2],col=diagnosis+1)
+```
+
+```{r}
+pc.dist<-dist(wisc.pr$x[,1:2])
+pc.hclust<-hclust(pc.dist,method="ward.D2")
+plot(pc.hclust)
+```
+
+```{r}
+grps3<-cutree(pc.hclust,k=3)
+table(grps3)
+```
+```{r}
+table(grps3,
+      diagnosis)
+```
+
+##Prediction
+```{r}
+#url <- "new_samples.csv"
+url <- "https://tinyurl.com/new-samples-CSV"
+new <- read.csv(url)
+npc <- predict(wisc.pr, newdata=new)
+npc
+```
+```{r}
+plot(wisc.pr$x[,1:2], col=grps3)
+points(npc[,1], npc[,2], col="blue", pch=16)
+```
+
+
