@@ -1,0 +1,103 @@
+---
+title: "class06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 1:Reading files again
+
+Here we are going to using the **read.table()** function and friends to read some 
+example flat files.
+
+First lets try adding a simple plot
+
+```{r}
+plot(1:10)
+```
+Back to file reading...
+
+```{r}
+table1<-read.table("https://bioboot.github.io/bimm143_W19/class-material/test1.txt")
+table1
+```
+```{r}
+file1<-("https://bioboot.github.io/bimm143_W19/class-material/test2.txt")
+data1<-read.csv(file1)
+data1
+```
+
+## Section 2 R.Function
+```{r}
+add <- function(x, y=1) {
+  # Sum the input x and y    
+  x + y 
+}
+```
+Lets try using this function
+
+```{r}
+add(1,100)
+```
+
+```{r}
+add(c(1,2,3))
+add(c(1,2,3),4)
+add(1,2,2)
+add(x=1,y="b"")
+```
+
+```{r}
+rescale <- function(x) {   
+  rng <-range(x)   
+  (x - rng[1]) / (rng[2] - rng[1]) 
+}
+```
+
+Test on a small example where we know that the answer should be!
+
+```{r}
+rescale(1:10)
+```
+
+```{r}
+rescale(c(1,2,NA,3,10))
+```
+
+```{r}
+rescale2 <- function(x) {   
+  rng <-range(x,na.rm=TRUE)   
+  (x - rng[1]) / (rng[2] - rng[1]) 
+}
+```
+```{r}
+rescale2(c(1,2,NA,3,10))
+```
+
+```{r}
+rescale3 <- function(x, na.rm=TRUE, plot=FALSE) {
+  
+    rng <-range(x, na.rm=na.rm) 
+    print("Hello")
+    
+    answer <- (x - rng[1]) / (rng[2] - rng[1])   
+    print("is it me you are looking for?") 
+  if(plot) {
+    plot(answer, typ='b', lwd=4)    
+  }   
+  print('I can see it in ...') 
+  return(answer) 
+  }
+```
+
+```{r}
+rescale3(c(1:6,NA,10),plot = TRUE)
+```
+
+
+
+
+
+
