@@ -2,7 +2,7 @@
 title: "class09"
 author: "Yushan LIU"
 date: "February 7, 2019"
-output: html_document
+output: github_document
 ---
 
 Preparing the data
