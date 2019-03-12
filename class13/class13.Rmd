@@ -1,0 +1,66 @@
+---
+title: "class13:Structure based drug discovery"
+author: "Yushan LIU"
+date: "February 19, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Prepare HIV-protease molecule for docking
+
+First get a PDB structure from the online database then clean it up for docking
+```{r}
+library(bio3d)
+file.name <- get.pdb("1hsg")
+```
+Read file into R and clean it up (remove non-protein bits) and also we will save the ligand into separate file
+```{r}
+hiv <- read.pdb(file.name)
+hiv
+```
+
+Q1: What is the name of the two non protein resid values in this structure?  What does resid correspond to and how would you get a listing of all reside values in this structure? 
+HOH (127), MK1 (1)
+```{r}
+prot <- trim.pdb(hiv,"protein")
+lig  <- trim.pdb(hiv, "ligand")
+```
+```{r}
+write.pdb(prot,file="1hsg_protein.pdb")
+write.pdb(lig,file="1hsg_lig.pdb")
+```
+
+```{r}
+library(bio3d) 
+res <- read.pdb("all.pdbqt", multi=TRUE) 
+write.pdb(res, "results.pdb") 
+```
+
+```{r}
+# 
+res <- read.pdb("all.pdbqt", multi=TRUE) 
+ori <- read.pdb("1hsg_lig.pdbqt") 
+rmsd(ori, res)
+```
+
+Q4:  Qualitatively, how good are the docks?  Is the crystal binding mode reproduced? Is it the best conformation according to AutoDock Vina?
+
+Q5:  Quantitatively how good are the docks?  Is the crystal binding mode reproduced within 1Å RMSD for all atoms? 
+
+Q6:  How would you determine the RMSD for heavy atoms only (i.e. non hydrogen atoms)? HINT: The atom.select() function will be of help here along with the selection string “noh” for no hydrogens.
+
+```{r}
+pdb <- read.pdb("1HEL")
+m<-nma(pdb)
+plot(m)
+```
+```{r}
+# Visualize NMA results 
+mktrj(m, mode=7, file="nma_7.pdb")
+
+```
+
+
